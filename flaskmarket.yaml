@@ -1,0 +1,48 @@
+# flaskmarket-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaskmarket
+  labels:
+    app: flaskmarket
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flaskmarket
+  template:
+    metadata:
+      labels:
+        app: flaskmarket
+    spec:
+      containers:
+      - name: flaskmarket
+        image: firasbt/flaskmarket:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        resources:
+          requests:
+            cpu: "100m"  # 0.1 CPU cores
+            memory: "128Mi"  # 128 MiB
+          limits:
+            cpu: "200m"  # 0.2 CPU cores
+            memory: "256Mi"  # 256 MiB
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flaskmarket-service
+  labels:
+    app: flaskmarket
+spec:
+  type: LoadBalancer
+  selector:
+    app: flaskmarket
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 3000
