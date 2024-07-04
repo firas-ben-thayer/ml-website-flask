@@ -1,6 +1,6 @@
 from market import app
 from flask import render_template, redirect, url_for, flash
-from market.models import Item,User
+from market.models import Item, User, Exercise
 from market.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
 from market import db
 from flask_login import login_user
@@ -50,6 +50,21 @@ def login_page():
             flash('Username and password are not matching! Please try again', category='danger')
             return render_template('login.html', form=form)
     return render_template('login.html', form=form)
+
+@app.route("/exercises", methods = ['GET', 'POST'])
+def exercise_page():
+    exercises = Exercise.query.all()
+    return render_template('exercises.html',exercises=exercises)
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    exercise_to_delete = Exercise.query.get_or_404(id)
+    try:
+        db.session.delete(exercise_to_delete)
+        db.session.commit()
+        return redirect(url_for('exercise_page'))
+    except:
+        return  flash(f'Exercise failed to be deleted', category='danger')
 
 @app.route('/code-server')
 def code_server():
