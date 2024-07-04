@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
-from market.models import User
+from ressources.models import User
 
 class RegisterForm(FlaskForm):
     
@@ -26,9 +26,16 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password:', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
-
-class PurchaseItemForm(FlaskForm):
-    submit = SubmitField('Purchase Item')
-
-class SellItemForm(FlaskForm):
-    submit = SubmitField('Sell Item')
+    
+class Exercise(FlaskForm):
+    
+    def validate_name(self, name_to_check): # the name of the function must be written like validate_<field> for the built in functions of flaskforms to work
+        name = User.query.filter_by(exercise_name=name_to_check.data).first()
+        if name:
+            raise ValidationError('Exercise name already exists. Please choose another name')
+    
+    exercise_name = StringField('Exercise name:', validators=[Length(min=2, max=30), DataRequired()])
+    subject = StringField('Subject:', validators=[Length(min=2, max=60), DataRequired()])
+    description = StringField('Description:', validators=[Length(min=2, max=1024), DataRequired()])
+    content = StringField('Content', validators=[Length(min=2), DataRequired()])
+    submit = SubmitField('Create Exercise')

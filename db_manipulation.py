@@ -1,5 +1,5 @@
-from market import db, app
-from market.models import Exercise
+from ressources import db, app
+from ressources.models import Exercise
 
 # # Push the application context
 # with app.app_context():

@@ -1,4 +1,4 @@
-from market import db, app, bcrypt, login_manager
+from ressources import db, app, bcrypt, login_manager
 from flask_login import UserMixin # this contains predetermined calls that we need in login_manager along with login_manager check https://flask-login.readthedocs.io/en/latest/#how-it-works fpr more info
 
 @login_manager.user_loader
@@ -48,7 +48,7 @@ class Exercise(db.Model):
     id = db.Column(db.Integer(), primary_key = True, nullable=False)
     name = db.Column(db.String(length=30), nullable=False, unique=True)
     subject = db.Column(db.String(length=50), nullable=False)
-    description = db.Column(db.String(), nullable=False, unique=True)
+    description = db.Column(db.String(), nullable=False, unique=False)
     content = db.Column(db.String(), nullable=False)
     author = db.Column(db.Integer(), db.ForeignKey('user.id'))
     

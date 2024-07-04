@@ -1,22 +1,14 @@
-from market import app
+from ressources import app
 from flask import render_template, redirect, url_for, flash
-from market.models import Item, User, Exercise
-from market.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
-from market import db
+from ressources.models import Item, User, Exercise
+from ressources.forms import RegisterForm, LoginForm
+from ressources import db
 from flask_login import login_user
 
 @app.route("/")
 @app.route("/home")
 def home_page():
     return render_template('home.html')
-
-@app.route("/market", methods = ['GET', 'POST'])
-def market_page():
-    purchase_form = PurchaseItemForm()
-    if purchase_form.validate_on_submit():
-        print(purchase_form['submit'])
-    items = Item.query.all()
-    return render_template('market.html', items=items, purchase_form=purchase_form)
 
 @app.route("/register", methods = ['GET', 'POST'])
 def register_page():
@@ -28,7 +20,7 @@ def register_page():
         db.session.add(user_to_create)
         db.session.commit()
         
-        return redirect(url_for('market_page')) # calls the function market_page
+        return redirect(url_for('home_page')) # calls the function home_page
     
     if form.errors != {}: # If there's no errors in the validation phase
         for err_msg in form.errors.values():
@@ -45,7 +37,7 @@ def login_page():
         if attempted_user and attempted_user.check_password_correction(attempted_password=form.password.data):
             login_user(attempted_user) # This is very important!!! if you use this you can have the information about the user so you can show them in the html
             flash(f'Success! You are logged in as: {attempted_user.username}', category='success')
-            return redirect(url_for('market_page'))
+            return redirect(url_for('home_page'))
         else:
             flash('Username and password are not matching! Please try again', category='danger')
             return render_template('login.html', form=form)
@@ -55,6 +47,24 @@ def login_page():
 def exercise_page():
     exercises = Exercise.query.all()
     return render_template('exercises.html',exercises=exercises)
+
+@app.route("/create_exercise", methods = ['GET', 'POST'])
+def create_exercise_page():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user_to_create = User(username=form.username.data,
+                              email_address=form.email_address.data,
+                              password=form.password1.data)
+        db.session.add(user_to_create)
+        db.session.commit()
+        
+        return redirect(url_for('exercise_page')) # calls the function exercise_page
+    
+    if form.errors != {}: # If there's no errors in the validation phase
+        for err_msg in form.errors.values():
+            flash(f'There was an error with creating a user: {err_msg}', category='danger')
+        return render_template('create_exercise.html', form=form)
+    return render_template('create_exercise.html', form=form)
 
 @app.route('/delete/<int:id>')
 def delete(id):

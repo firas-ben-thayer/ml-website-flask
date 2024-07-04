@@ -3,7 +3,6 @@
         background-color: #212121;
     }
 </style>
-
 <!-- Modal add Exercise -->
 <div class="modal fade" id="AddExercise" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -21,7 +20,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Create</button>
+                
+                <button type="button" class="btn btn-primary" onclick="location.href='{{ url_for('create_exercise_page') }}'">Create</button> <!--somehow, idk why adding ; at first and at the end would erase the annoying error ; expected and still work-->
             </div>
         </div>
     </div>
@@ -91,8 +91,8 @@
                     <br><br>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-danger">
-                            <a href="{{ url_for('delete', id=exercise.id) }}"></a>Delete
+                        <button type="button" class="btn btn-danger" onclick="location.href='{{ url_for('delete', id=exercise.id) }}'">
+                            <a href=></a>Delete
                         </button>
                     </div>
                 </form>
