@@ -20,15 +20,7 @@
             {{ form.password(class="form-control", placeholder="Password") }}
 
             <br>
-
-
-            <div class="checkbox mb-3">
-               <h6>Do not have an account?</h6>
-               <a class="btn btn-sm btn-secondary" href="{{ url_for('register_page') }}">Register</a>
-            </div>
-
             {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
-
         </form>
 </body> 
 {% endblock %}

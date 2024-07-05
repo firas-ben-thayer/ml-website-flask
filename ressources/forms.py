@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
 from ressources.models import User
 
@@ -27,7 +27,7 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
     
-class Exercise(FlaskForm):
+class ExerciseForm(FlaskForm):
     
     def validate_name(self, name_to_check): # the name of the function must be written like validate_<field> for the built in functions of flaskforms to work
         name = User.query.filter_by(exercise_name=name_to_check.data).first()
@@ -37,5 +37,6 @@ class Exercise(FlaskForm):
     exercise_name = StringField('Exercise name:', validators=[Length(min=2, max=30), DataRequired()])
     subject = StringField('Subject:', validators=[Length(min=2, max=60), DataRequired()])
     description = StringField('Description:', validators=[Length(min=2, max=1024), DataRequired()])
-    content = StringField('Content', validators=[Length(min=2), DataRequired()])
-    submit = SubmitField('Create Exercise')
+    content = TextAreaField('Content', validators=[Length(min=2), DataRequired()])
+    create = SubmitField('Create Exercise')
+    edit = SubmitField('Update Exercise')

@@ -7,7 +7,7 @@ from ressources.models import Exercise
 #     Exercise.__table__.drop(db.engine)
 #     print("Exercise table dropped.")
 
-# Update the tables
+# # Update the tables
 # db.create_all()
 
 # # Push the application context
