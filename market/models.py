@@ -33,12 +33,22 @@ class User (db.Model, UserMixin):
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
     
 class Item(db.Model):
-    id = price = db.Column(db.Integer(), primary_key = True, nullable=False)
+    id = db.Column(db.Integer(), primary_key = True, nullable=False)
     name = db.Column(db.String(length=30), nullable=False, unique=True)
     price = db.Column(db.Integer(), nullable=False)
     barcode = db.Column(db.String(length=12), nullable=False, unique=True)
     description = db.Column(db.String(length=1024), nullable=False, unique=True)
     owner = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    
+    def __repr__(self):
+        return f'Item {self.name}'
+    
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.String(1024), nullable=False)
+
     
     def __repr__(self):
         return f'Item {self.name}'

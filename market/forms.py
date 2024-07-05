@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
-from market.models import User
+from market.models import User, Contact
 
 class RegisterForm(FlaskForm):
     
@@ -32,3 +32,10 @@ class PurchaseItemForm(FlaskForm):
 
 class SellItemForm(FlaskForm):
     submit = SubmitField('Sell Item')
+
+class ContactUs(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    message = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Send')
+
