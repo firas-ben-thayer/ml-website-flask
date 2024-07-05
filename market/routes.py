@@ -1,4 +1,4 @@
-from market import app
+from market import app, mail 
 from flask import render_template, redirect, url_for, flash, request, redirect
 from market.models import Item,User, Contact
 from market.forms import RegisterForm, LoginForm, PurchaseItemForm, ContactUs
@@ -90,7 +90,7 @@ def about():
 
         # Compose the email message
         msg = Message('Contact Us',  # Subject
-                      sender=app.config['MAIL_DEFAULT_SENDER'],
+                      sender=email,  # Sender address from form
                       recipients=['nima.saghi1993@gmail.com'])  # Replace with your email
 
         msg.body = f'Name: {name}\nEmail: {email}\nMessage: {message}'
