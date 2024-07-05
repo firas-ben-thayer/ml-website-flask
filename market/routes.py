@@ -109,3 +109,4 @@ def about():
 def logout():
     logout_user()
     return redirect(url_for('home_page'))
+
