@@ -27,7 +27,7 @@
                         <tr>
                             <td>{{ user.username }}</td>
                             <td>{{ user.email_address }}</td>
-                            <td>{{ user.authority }}</td>
+                            <td>{{ get_authority_label(user.authority) }}</td>
                             <td>
                                 <button class="btn btn-outline btn-light" data-toggle="modal" data-target="#Modal-Edit-{{ user.id }}">
                                     <i class="fa fa-edit"></i>
@@ -40,5 +40,8 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="pagination-container">
+                {{ pagination.links }}
+            </div>
     </div>
 {% endblock %}

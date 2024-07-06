@@ -3,7 +3,9 @@ from flask import render_template, redirect, url_for, flash, request
 from ressources.models import User, Exercise
 from ressources.forms import EditUserForm, LoginForm, ExerciseForm, CreateUserForm
 from ressources import db
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
+from ressources.decorators import admin_required, admin_or_teacher_required
+from flask_paginate import Pagination, get_page_parameter
 
 from jinja2 import Environment, select_autoescape
 
@@ -31,26 +33,54 @@ def login_page():
     return render_template('login.html', form=form)
 
 @app.route("/logout")
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('home_page'))
 
 # Exercises page
 
-@app.route("/exercises", methods = ['GET', 'POST'])
+from flask import request
+from flask_paginate import Pagination, get_page_parameter
+
+@app.route("/exercises", methods=['GET', 'POST'])
+@login_required
 def exercise_page():
-    exercises = Exercise.query.all()
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    per_page = 5
+    offset = (page - 1) * per_page
+    
+    exercises = Exercise.query.order_by(Exercise.id).offset(offset).limit(per_page).all()
+    total = Exercise.query.count()
+    
     authors = {}
     for exercise in exercises:
-        author_id = exercise.author # Get the author id equivalent of username id
-        author = User.query.get(author_id) # Get the information that the id has
+        author_id = exercise.author
+        author = User.query.get(author_id)
         if author:
-            authors[exercise.id] = author.username # Now that we got information we want to get the actual name of the author
+            authors[exercise.id] = author.username
         else:
             authors[exercise.id] = "Unknown"
-    return render_template('exercises.html', exercises=exercises, authors=authors, author_id=author_id) # Now we assign author instead of the number in html
+    
+    pagination = Pagination(page=page, per_page=per_page, total=total, css_framework='bootstrap4')
+    
+    return render_template('exercises.html', 
+                           exercises=exercises, 
+                           authors=authors, 
+                           author_id=author_id,
+                           pagination=pagination)
+    
+@app.route('/view_exercise/<int:id>')
+@login_required
+def view_exercise_page(id):
+    exercise_to_view = Exercise.query.get_or_404(id)
+    author = User.query.get(exercise_to_view.author)
+    return render_template('view_exercise_page.html', exercise=exercise_to_view, author=author.username)
+
 
 @app.route("/create_exercise", methods=['GET', 'POST'])
+@login_required
+@admin_or_teacher_required
 def create_exercise_page():
     form = ExerciseForm()
     if current_user.is_authenticated:
@@ -78,6 +108,8 @@ def create_exercise_page():
     return render_template('create_exercise.html', form=form)
 
 @app.route('/edit_exercise/<int:id>', methods = ['GET', 'POST'])
+@login_required #suprisingly so easy to block access to pages without login
+@admin_or_teacher_required
 def edit_exercise_page(id):
     exercise_to_update = Exercise.query.get_or_404(id)
     print(exercise_to_update.name)
@@ -104,6 +136,8 @@ def edit_exercise_page(id):
     return render_template('edit_exercise.html', form=form) # calls the function exercise_page
 
 @app.route('/delete_exercise/<int:id>')
+@login_required
+@admin_or_teacher_required
 def delete_exercise(id):
     exercise_to_delete = Exercise.query.get_or_404(id)
     try:
@@ -116,12 +150,26 @@ def delete_exercise(id):
 
 # Users page
 
-@app.route("/users", methods = ['GET', 'POST'])
+@app.route("/users", methods=['GET', 'POST'])
+@login_required
+@admin_required
 def user_page():
-    users = User.query.all()
-    return render_template('users.html', users=users) # Now we assign author instead of the number in html
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    per_page = 5  # You can adjust this number as needed
+    offset = (page - 1) * per_page
+    
+    users = User.query.order_by(User.id).offset(offset).limit(per_page).all()
+    total = User.query.count()
+    
+    pagination = Pagination(page=page, per_page=per_page, total=total, css_framework='bootstrap4')
+    
+    return render_template('users.html', 
+                           users=users, 
+                           pagination=pagination)
 
 @app.route("/create_user", methods = ['GET', 'POST'])
+@login_required
+@admin_required
 def create_user_page():
     form = CreateUserForm()
     if form.validate_on_submit():
@@ -141,6 +189,8 @@ def create_user_page():
     return render_template('create_user.html', form=form)
 
 @app.route('/edit_user/<int:id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def edit_user_page(id):
     user_to_update = User.query.get_or_404(id)
     form = EditUserForm(current_user=user_to_update)
@@ -169,6 +219,8 @@ def edit_user_page(id):
 
 
 @app.route('/delete_user/<int:id>')
+@login_required
+@admin_required
 def delete_user(id):
     user_to_delete = User.query.get_or_404(id)
     try:
@@ -180,6 +232,7 @@ def delete_user(id):
 
 
 @app.route('/code-server')
+@login_required
 def code_server():
     # Replace with the IP address or domain where your Docker container is hosted
     code_server_url = 'http://localhost:8080'  
