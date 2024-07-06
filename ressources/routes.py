@@ -1,7 +1,7 @@
 from ressources import app
-from flask import render_template, redirect, url_for, flash
-from ressources.models import Item, User, Exercise
-from ressources.forms import RegisterForm, LoginForm, ExerciseForm
+from flask import render_template, redirect, url_for, flash, request
+from ressources.models import User, Exercise
+from ressources.forms import EditUserForm, LoginForm, ExerciseForm, CreateUserForm
 from ressources import db
 from flask_login import login_user, current_user, logout_user
 
@@ -14,24 +14,6 @@ env = Environment(autoescape=select_autoescape())
 @app.route("/home")
 def home_page():
     return render_template('home.html')
-
-@app.route("/register", methods = ['GET', 'POST'])
-def register_page():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        user_to_create = User(username=form.username.data,
-                              email_address=form.email_address.data,
-                              password=form.password1.data)
-        db.session.add(user_to_create)
-        db.session.commit()
-        return redirect(url_for('home_page')) # calls the function home_page
-    
-    if form.errors != {}: # If there's no errors in the validation phase
-        for err_msg in form.errors.values():
-            flash(f'There was an error with creating a user: {err_msg}', category='danger')
-        return render_template('register.html', form=form)
-    
-    return render_template('register.html', form=form)
 
 @app.route("/login", methods = ['GET', 'POST'])
 def login_page():
@@ -52,6 +34,8 @@ def login_page():
 def logout():
     logout_user()
     return redirect(url_for('home_page'))
+
+# Exercises page
 
 @app.route("/exercises", methods = ['GET', 'POST'])
 def exercise_page():
@@ -79,7 +63,7 @@ def create_exercise_page():
         exercise_to_create = Exercise(name=form.exercise_name.data,
                                       subject=form.subject.data,
                                       description=form.description.data,
-                                      content=form.description.data,
+                                      content=form.content.data,
                                       author=user)
         db.session.add(exercise_to_create)
         db.session.commit()
@@ -118,15 +102,81 @@ def edit_exercise_page(id):
     form.content.data = exercise_to_update.content
     return render_template('edit_exercise.html', form=form) # calls the function exercise_page
 
-@app.route('/delete/<int:id>')
-def delete(id):
+@app.route('/delete_exercise/<int:id>')
+def delete_exercise(id):
     exercise_to_delete = Exercise.query.get_or_404(id)
     try:
         db.session.delete(exercise_to_delete)
         db.session.commit()
+        flash(f"{exercise_to_delete.name} deleted successfully", category='success')
         return redirect(url_for('exercise_page'))
     except:
         return  flash(f'Exercise failed to be deleted', category='danger')
+
+# Users page
+
+@app.route("/users", methods = ['GET', 'POST'])
+def user_page():
+    users = User.query.all()
+    return render_template('users.html', users=users) # Now we assign author instead of the number in html
+
+@app.route("/create_user", methods = ['GET', 'POST'])
+def create_user_page():
+    form = CreateUserForm()
+    if form.validate_on_submit():
+        user_to_create = User(username=form.username.data,
+                              email_address=form.email_address.data,
+                              authority=form.authority.data,
+                              password=form.password1.data)
+        db.session.add(user_to_create)
+        db.session.commit()
+        return redirect(url_for('user_page')) # calls the function home_page
+    
+    if form.errors != {}: # If there's no errors in the validation phase
+        for err_msg in form.errors.values():
+            flash(f'There was an error with creating a user: {err_msg}', category='danger')
+        return render_template('create_user.html', form=form)
+    
+    return render_template('create_user.html', form=form)
+
+@app.route('/edit_user/<int:id>', methods=['GET', 'POST'])
+def edit_user_page(id):
+    user_to_update = User.query.get_or_404(id)
+    form = EditUserForm(current_user=user_to_update)
+    
+    if form.validate_on_submit():
+        user_to_update.username = form.username.data
+        user_to_update.email_address = form.email_address.data
+        user_to_update.authority = form.authority.data
+
+        # Check if new password is provided
+        if form.password1.data and form.password2.data:
+            user_to_update.password = form.password1.data
+
+        db.session.commit()
+        flash("User updated successfully", category='success')
+        return redirect(url_for('user_page')) 
+
+    if form.errors:
+        for err_msg in form.errors.values():
+            flash(f'There was an error with updating the user: {err_msg}', category='danger')
+
+    form.username.data = user_to_update.username
+    form.email_address.data = user_to_update.email_address
+    form.authority.data = user_to_update.authority
+    return render_template('edit_user.html', form=form)
+
+
+@app.route('/delete_user/<int:id>')
+def delete_user(id):
+    user_to_delete = User.query.get_or_404(id)
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        return redirect(url_for('user_page'))
+    except:
+        return  flash(f'User failed to be deleted', category='danger')
+
 
 @app.route('/code-server')
 def code_server():

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block title%}
-    Exercice Page
+    User Page
 {% endblock %}
 {% block content %}
     <div style="margin-top:20px; margin-left:20px; margin-right:20px; display: flex; justify-content: space-between;">
-        <h2>Exercices</h2>
-        <button class="btn btn-primary" data-toggle="modal" data-target="#CreateExercise">
+        <h2>Users</h2>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#CreateUser">
             <i class="fa fa-plus"></i>
         </button>
     </div>
@@ -14,28 +14,25 @@
                 <thead>
                     <tr>
                         <!-- Your Columns HERE -->
-                        <th scope="col">Name</th>
-                        <th scope="col">Subject</th>
-                        <th scope="col">Author</th>
+                        <th scope="col">User Name</th>
+                        <th scope="col">Email Adress</th>
+                        <th scope="col">Authority</th>
                         <th scope="col">Options</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- Your rows inside the table HERE: -->
-                    {% for exercise in exercises %}
-                    {% include 'includes/exercises_modals.html' %}
+                    {% for user in users %}
+                    {% include 'includes/users_modals.html' %}
                         <tr>
-                            <td>{{ exercise.name }}</td>
-                            <td>{{ exercise.subject }}</td>
-                            <td>{{ authors[exercise.id] }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email_address }}</td>
+                            <td>{{ user.authority }}</td>
                             <td>
-                                <button class="btn btn-outline btn-info" data-toggle="modal" data-target="#Modal-MoreInfo-{{ exercise.id }}">
-                                    <i class="fa fa-info-circle"></i>
-                                </button>
-                                <button class="btn btn-outline btn-light" data-toggle="modal" data-target="#Modal-Edit-{{ exercise.id }}">
+                                <button class="btn btn-outline btn-light" data-toggle="modal" data-target="#Modal-Edit-{{ user.id }}">
                                     <i class="fa fa-edit"></i>
                                 </button><!--# is important in calling a modal-->
-                                <button class="btn btn-outline btn-danger" data-toggle="modal" data-target="#Modal-Delete-{{ exercise.id }}">
+                                <button class="btn btn-outline btn-danger" data-toggle="modal" data-target="#Modal-Delete-{{ user.id }}">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </td>

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title%}
+    Register Page
+{% endblock %}
+{% block content%}
+<br>
+<body class="text-center">
+<div class="container"> <!-- put everything in the middle -->
+    <form method="POST" class = form-register style="color:white">
+        {{ form.hidden_tag() }}
+        <img class="mb-4" src="https://www.hv.se/contentassets/4552afcbcf1743cfa20e330297a82d41/hogskolan_vast_logotyp_bla2.png" width="250" height="100" alt="">
+        <h1 class="h3 mb-3 font-weight-normal">
+            Create a New user
+        </h1>
+        <br>
+        {{ form.username.label() }}
+        {{ form.username(class="form-control", placeholder="User Name") }}
+
+        {{ form.email_address.label() }}
+        {{ form.email_address(class="form-control", placeholder="Email Address") }}
+
+        {{ form.authority.label() }}
+        {{ form.authority(class="form-control", placeholder="Authority") }}
+        <br>
+        {{ form.create(class="btn btn-lg btn-block btn-primary") }}
+    </form>
+</div>
+</body> 
+{% endblock %}
