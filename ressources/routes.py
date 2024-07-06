@@ -50,29 +50,30 @@ def exercise_page():
             authors[exercise.id] = "Unknown"
     return render_template('exercises.html', exercises=exercises, authors=authors, author_id=author_id) # Now we assign author instead of the number in html
 
-@app.route("/create_exercise", methods = ['GET', 'POST'])
+@app.route("/create_exercise", methods=['GET', 'POST'])
 def create_exercise_page():
     form = ExerciseForm()
-    if current_user!=current_user:
-        user = current_user.get_id() # return username in get_id()
+    if current_user.is_authenticated:
+        user = current_user.get_id()
     else:
-        user = 0 # or 'some fake value', whatever
-    print('You are ',user)
-        
+        user = 0  # or 'some fake value', whatever
+    
     if form.validate_on_submit():
-        exercise_to_create = Exercise(name=form.exercise_name.data,
-                                      subject=form.subject.data,
-                                      description=form.description.data,
-                                      content=form.content.data,
-                                      author=user)
+        exercise_to_create = Exercise(
+            name=form.exercise_name.data,
+            subject=form.subject.data,
+            description=form.description.data,
+            content=form.content.data,
+            author=user
+        )
         db.session.add(exercise_to_create)
         db.session.commit()
-        return redirect(url_for('exercise_page')) # calls the function exercise_page
+        flash('Exercise created successfully!', category='success')
+        return redirect(url_for('exercise_page'))  # Adjust the redirect as necessary
     
-    if form.errors != {}: # If there's no errors in the validation phase
+    if form.errors:
         for err_msg in form.errors.values():
             flash(f'There was an error with creating an exercise: {err_msg}', category='danger')
-        return render_template('create_exercise.html', form=form)
     
     return render_template('create_exercise.html', form=form)
 

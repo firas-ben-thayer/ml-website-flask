@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
 {% block title%}
-    Edit User
+    Edit User Page
 {% endblock %}
 {% block content%}
 <div style="margin-top:20px; margin-left:20px; margin-right:20px; justify-content: space-between;">
     <form method="POST" class="form-register" style="color:white">
         {{ form.hidden_tag() }}
-        <h1 class="h3 mb-3 font-weight-normal">Edit a User</h1>
+        <h1 class="h3 mb-3 font-weight-normal">
+            Edit a User
+        </h1>
         
         {{ form.username.label }}
         {{ form.username(class="form-control", placeholder="User Name") }}
