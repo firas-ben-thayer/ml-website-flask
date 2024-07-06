@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask import request
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError, Optional
 from ressources.models import User, Exercise
@@ -54,7 +55,14 @@ class ExerciseForm(FlaskForm):
     def validate_exercise_name(self, name_to_check):
         exercise = Exercise.query.filter_by(name=name_to_check.data).first()
         if exercise:
-            raise ValidationError('Exercise name already exists. Please choose another name')
+            # Check if we're editing an existing exercise
+            if request.view_args and 'id' in request.view_args:
+                # If the exercise with this name is not the one we're editing, raise an error
+                if exercise.id != request.view_args['id']:
+                    raise ValidationError('Exercise name already exists. Please choose another name')
+            else:
+                # If we're creating a new exercise, raise an error
+                raise ValidationError('Exercise name already exists. Please choose another name')
     
     exercise_name = StringField('Exercise name:', validators=[Length(min=2, max=30), DataRequired()])
     subject = StringField('Subject:', validators=[Length(min=2, max=60), DataRequired()])

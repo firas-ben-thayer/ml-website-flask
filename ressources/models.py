@@ -35,4 +35,5 @@ class Exercise(db.Model):
     
     def __repr__(self):
         return f'Exercise name: {self.name}'
+    
 app.app_context().push() # This is needed when we want to create a new database when we run the code db.create_all() we need to push context first

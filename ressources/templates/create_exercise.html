@@ -23,7 +23,10 @@
         {{ form.content(class="form-control", placeholder="Content", rows="18") }}
 
         <br>
-        {{ form.create(class="btn btn-lg btn-block btn-primary") }}
+        <button type="button" class="btn btn-lg btn-secondary" data-dismiss="modal" onclick="location.href='{{ url_for('exercise_page') }}'">
+            Cancel
+        </button>
+        {{ form.create(class="btn btn-lg btn-primary") }}
     </form>
 </div>
 {% endblock %}

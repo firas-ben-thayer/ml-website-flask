@@ -112,27 +112,29 @@ def create_exercise_page():
 @admin_or_teacher_required
 def edit_exercise_page(id):
     exercise_to_update = Exercise.query.get_or_404(id)
-    print(exercise_to_update.name)
     form = ExerciseForm()
-    if current_user!=current_user:
-        user = current_user.get_id() # return username in get_id()
-    else:
-        user = 0 # or 'some fake value', whatever
-        
+    
     if form.validate_on_submit():
         exercise_to_update.name = form.exercise_name.data
         exercise_to_update.subject = form.subject.data
         exercise_to_update.description = form.description.data
         exercise_to_update.content = form.content.data
-        exercise_to_update.author = user
-        db.session.add(exercise_to_update)
-        db.session.commit()
-        flash("Exercise updated")
-        return redirect(url_for('exercise_page')) # calls the function exercise_page
+        exercise_to_update.author = current_user.id  # Use current_user.id directly
+        db.session.commit()  # No need to add, just commit the changes
+        flash("Exercise updated successfully", "success")
+        return redirect(url_for('exercise_page'))
+    
+    # Pre-populate form fields
     form.exercise_name.data = exercise_to_update.name
     form.subject.data = exercise_to_update.subject
     form.description.data = exercise_to_update.description
-    form.content.data = exercise_to_update.content
+    form.content.data = exercise_to_update.content # calls the function exercise_page
+    
+    if form.errors != {}: # If there's no errors in the validation phase
+        for err_msg in form.errors.values():
+            flash(f'There was an error with creating a user: {err_msg}', category='danger')
+        return render_template('edit_exercise.html', form=form)
+    
     return render_template('edit_exercise.html', form=form) # calls the function exercise_page
 
 @app.route('/delete_exercise/<int:id>')

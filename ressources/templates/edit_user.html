@@ -26,7 +26,10 @@
         {{ form.password2(class="form-control", placeholder="Confirm Password") }}
         
         <br>
-        {{ form.edit(class="btn btn-lg btn-block btn-primary") }}
+        <button type="button" class="btn btn-lg btn-secondary" data-dismiss="modal" onclick="location.href='{{ url_for('user_page') }}'">
+            Cancel
+        </button>
+        {{ form.edit(class="btn btn-lg btn-primary") }}
     </form>
 </div>
 {% endblock %}
