@@ -1,12 +1,12 @@
 from ressources import app
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, Response, Blueprint
 from ressources.models import User, Exercise
 from ressources.forms import EditUserForm, LoginForm, ExerciseForm, CreateUserForm
 from ressources import db
 from flask_login import login_user, current_user, logout_user, login_required
 from ressources.decorators import admin_required, admin_or_teacher_required
 from flask_paginate import Pagination, get_page_parameter
-
+import requests
 from jinja2 import Environment, select_autoescape
 
 env = Environment(autoescape=select_autoescape())
@@ -233,9 +233,23 @@ def delete_user(id):
         return  flash(f'User failed to be deleted', category='danger')
 
 
-@app.route('/code-server')
+code_server = Blueprint('code_server', __name__)
+
+@code_server.route('/code-server/', defaults={'path': ''})
+@code_server.route('/code-server/<path:path>')
 @login_required
-def code_server():
-    # Replace with the IP address or domain where your Docker container is hosted
-    code_server_url = 'http://localhost:8080'  
-    return redirect(code_server_url)
+def proxy_code_server(path):
+    code_server_url = f'http://vscode-python-service.default.svc.cluster.local:8080/{path}'
+    try:
+        resp = requests.get(code_server_url, stream=True)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        return f"<h1>Error</h1><p>{str(e)}</p>", 500
+
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
+
+    return Response(resp.content, resp.status_code, headers)
+
+def proxy_code_server(path):
+    app.logger.debug(f"Accessed /code-server/{path}")

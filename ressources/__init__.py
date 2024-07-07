@@ -14,5 +14,9 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login_page'  # Redirect to login page if not authenticated
 login_manager.login_message_category = 'danger'  # Message category for the flash message danger means it's in read
+
 app.jinja_env.globals.update(get_authority_label=get_authority_label)
 from ressources import routes # this needs to be here to execute the code after importing everything
+from ressources.routes import code_server  # Import the route
+# Register your routes
+app.register_blueprint(code_server)
