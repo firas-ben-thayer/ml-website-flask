@@ -35,5 +35,15 @@ class Exercise(db.Model):
     
     def __repr__(self):
         return f'Exercise name: {self.name}'
+
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.String(1024), nullable=False)
+
     
+    def __repr__(self):
+        return f'Item {self.name}'
+
 app.app_context().push() # This is needed when we want to create a new database when we run the code db.create_all() we need to push context first
