@@ -1,7 +1,7 @@
 from ressources import app
 from flask import render_template, redirect, url_for, flash, request, Response, Blueprint
-from ressources.models import User, Exercise
-from ressources.forms import EditUserForm, LoginForm, ExerciseForm, CreateUserForm
+from ressources.models import User, Exercise, Contact
+from ressources.forms import EditUserForm, LoginForm, ExerciseForm, CreateUserForm, ContactUs
 from ressources import db
 from flask_login import login_user, current_user, logout_user, login_required
 from ressources.decorators import admin_required, admin_or_teacher_required
@@ -39,6 +39,25 @@ def login_page():
 def logout():
     logout_user()
     return redirect(url_for('home_page'))
+
+# New feature route
+@app.route('/about_page', methods = ['GET', 'POST'])
+def about_page():
+    form = ContactUs()
+    if form.validate_on_submit():
+        message_to_us = Contact(name=form.name.data,
+                              email=form.email.data,
+                              message=form.message.data)
+        db.session.add(message_to_us)
+        db.session.commit()
+        
+        return redirect(url_for('about_page')) # calls the function market_page
+    
+    if form.errors != {}: # If there's no errors in the validation phase
+        for err_msg in form.errors.values():
+            flash(f'There was an error with creating a message: {err_msg}', category='danger')
+        return render_template('about.html', form=form)
+    return render_template('about.html',form=form)
 
 # Exercises page
 

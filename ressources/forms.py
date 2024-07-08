@@ -70,3 +70,9 @@ class ExerciseForm(FlaskForm):
     content = TextAreaField('Content', validators=[Length(min=2), DataRequired()])
     create = SubmitField('Create Exercise')
     edit = SubmitField('Update Exercise')
+    
+class ContactUs(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    message = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Send')
