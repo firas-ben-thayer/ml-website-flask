@@ -32,7 +32,7 @@
                             <a class="nav-link" href="{{ url_for('exercise_page') }}">Exercises</a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="{{ url_for('code_server.proxy_code_server', path='') }}">Start Coding</a>
+                            <a class="nav-link" href="{{ url_for('code_server.code_server_page') }}">Start Coding</a>
                         </li>
                         {% if current_user.authority == 0 %}
                             <li class="nav-item active">

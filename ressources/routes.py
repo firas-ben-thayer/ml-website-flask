@@ -8,6 +8,8 @@ from ressources.decorators import admin_required, admin_or_teacher_required
 from flask_paginate import Pagination, get_page_parameter
 import requests
 from jinja2 import Environment, select_autoescape
+from urllib.parse import urljoin
+import websocket
 
 env = Environment(autoescape=select_autoescape())
 
@@ -232,24 +234,29 @@ def delete_user(id):
     except:
         return  flash(f'User failed to be deleted', category='danger')
 
-
 code_server = Blueprint('code_server', __name__)
 
-@code_server.route('/code-server/', defaults={'path': ''})
-@code_server.route('/code-server/<path:path>')
+@code_server.route('/code-server')
 @login_required
-def proxy_code_server(path):
-    code_server_url = f'http://vscode-python-service.default.svc.cluster.local:8080/{path}'
-    try:
-        resp = requests.get(code_server_url, stream=True)
-        resp.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        return f"<h1>Error</h1><p>{str(e)}</p>", 500
+def code_server_page():
+    return redirect("/code-server/")  # This will redirect to the same host
 
-    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-    headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
+# This works but has some socket issue 
+# @code_server.route('/code-server/', defaults={'path': ''})
+# @code_server.route('/code-server/<path:path>')
+# @login_required
+# def proxy_code_server(path):
+#     code_server_url = f'http://vscode-python-service.default.svc.cluster.local:8080/{path}'
+#     try:
+#         resp = requests.get(code_server_url, stream=True)
+#         resp.raise_for_status()
+#     except requests.exceptions.RequestException as e:
+#         return f"<h1>Error</h1><p>{str(e)}</p>", 500
 
-    return Response(resp.content, resp.status_code, headers)
+#     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+#     headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
 
-def proxy_code_server(path):
-    app.logger.debug(f"Accessed /code-server/{path}")
+#     return Response(resp.content, resp.status_code, headers)
+
+# def proxy_code_server(path):
+#     app.logger.debug(f"Accessed /code-server/{path}")

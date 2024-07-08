@@ -30,7 +30,6 @@ kind: Service
 metadata:
   name: vscode-python-service
 spec:
-  type: ClusterIP
   selector:
     app: vscode-python
   ports:
