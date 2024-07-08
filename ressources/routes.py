@@ -95,8 +95,15 @@ def exercise_page():
 @login_required
 def view_exercise_page(id):
     exercise_to_view = Exercise.query.get_or_404(id)
-    author = User.query.get(exercise_to_view.author)
-    return render_template('view_exercise_page.html', exercise=exercise_to_view, author=author.username)
+    author_id = exercise_to_view.author
+    author = User.query.get(author_id)
+    author_name =''
+    print(author)
+    if author:
+        author_name = author.username
+    else:
+        author_name = "Unknown"
+    return render_template('view_exercise_page.html', exercise=exercise_to_view, author=author_name)
 
 
 @app.route("/create_exercise", methods=['GET', 'POST'])
